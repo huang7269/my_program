@@ -43,7 +43,7 @@ void student_sign_in()
         x=ver_code(x);                                 //验证码
         printf("----------------------------------------");
         struct student *s = search_student(hand,id);
-        if(s != NULL && (s->id,id) == 0)
+        if(s != NULL && strcmp(s->id,id) == 0)
         {    
             printf("用户已存在\n");
             printf("退出请按0,继续注册请按1\n");
@@ -171,8 +171,8 @@ void student_info()
     tea_hand = teacher_read(tea_hand);
     stu_hand = stu_create_node();
     stu_hand = student_read(stu_hand);     //读学生信息
-    struct student*ps = NULL;
-    struct teacher*s = NULL;
+    struct student*ps;
+    struct teacher*s;
     ps = stu_create_node();
     while(x)
     {
@@ -189,7 +189,7 @@ void student_info()
         x=ver_code(x);
         printf("正在确认中...\n");
         ps = search_student(stu_hand,id);    
-        if(NULL == s)
+        if(NULL == ps)
         {
             printf("登录失败\n");
             return;
@@ -226,12 +226,17 @@ void student_info()
         switch(choose)
         {
             case 1:search_data(tea_hand,stu_hand);break;
-            case 2:stu_change_password(ps);break;
+            case 2:ps=stu_change_password(ps);break;
             //case 3:stu_grade_find();break;
             //case 4:stu_email();break;
             //case 5:stu_question();break;
             //case 6:sma_umb();break;
-            case 7:flag = delete_stu_data(stu_hand,ps);break;
+            case 7:int h = delete_stu_data(stu_hand,ps);
+		   if(h == 0)
+		   {
+			return;   
+		   }
+		   break;
             case 0:flag = 0; 
             break;
             default:printf("无此功能\n");
@@ -266,7 +271,7 @@ int delete_stu_data(struct student*hand,struct student*current)
     {
         char id[20];
         sscanf(line,"%*s %*s %s",id);
-        if(strcmp(id,current->id)==0)
+        if(strcmp(id,current->id)!=0)
         {
             fputs(line,temp_fp);
         }
@@ -274,8 +279,8 @@ int delete_stu_data(struct student*hand,struct student*current)
     fclose(fp);
     fclose(temp_fp);
     remove("./student_data.txt");
-    rename("temp_fp.txt","./student_data.txt");
-    if(current = hand)
+    rename("temp.txt","./student_data.txt");
+    if(current == hand)
     {
         hand->next = current->next;
     }
@@ -293,7 +298,7 @@ int delete_stu_data(struct student*hand,struct student*current)
 }
 
 //修改密码
-void stu_change_password(struct student*current)
+struct student* stu_change_password(struct student*current)
 {
     char password_first[20];
     char password_second[20];
@@ -302,34 +307,34 @@ void stu_change_password(struct student*current)
     size_t len = strlen(password_first);
     if(len > 0 && password_first[len-1]=='\n')
     {
-        password_first[len-1] == '\0';
+        password_first[len-1] = '\0';
     }
     if (strlen(password_first) > 16)
     {
         printf("密码长度过长，请重新输入\n");
-        return;
+        return current;
     }
     printf("再输一次:");
     fgets(password_second,sizeof(password_second),stdin);
     len = strlen(password_second);
     if(len > 0 && password_second[len-1]=='\n')
     {
-        password_second[len-1] == '\0';
+        password_second[len-1] = '\0';
     }
     if (strlen(password_second) > 16)
     {
         printf("密码长度过长，请重新输入\n");
-        return;
+        return current;
     }
     if(strcmp(password_first,password_second)==0)
     {
         strcpy(current->password,password_first);
         printf("修改成功\n");
-        return;
+        return current;
     }
     else
     {
         printf("两次输入不同,修改错误\n");
-        return;
+        return current;
     }
 }

@@ -39,7 +39,7 @@ void search_teacher_name(struct teacher*hand);
 void search_student_all(struct student*hand);
 void search_student_id(struct student*hand);
 void search_student_name(struct student*hand);
-void change_password(struct teacher*current);
+struct teacher* change_password(struct teacher*current);
 int delete_tea_data(struct teacher*hand,struct teacher*current);
 
 
@@ -51,5 +51,8 @@ void add_student(struct student new_student,struct student*hand);
 void stu_free_list(struct student*hand);
 void student_info();
 int delete_stu_data(struct student*hand,struct student*current);
-void stu_change_password(struct student*current);
+struct student* stu_change_password(struct student*current);
+void teacher_write(struct teacher*current);
+void stu_write(struct student*current);
+
 

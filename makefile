@@ -1,8 +1,24 @@
-text.exe:main.o tea_f.o stu_f.o
-	gcc *.o -o $@
+CC=gcc
+
+jiaowu=main.c tea_f.c stu_f.c
+
+CFLAGS=-Wall -g
+
+OBJS=$(jiaowu:.c=.o)
+
+TARGET=my_program
+
+build:$(TARGET)
+
+
+$(TARGET):$(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^
 
 %.o:%.c
-	gcc -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
+
+run:$(TARGET)
+	./$(TARGET)
 
 clean:
-	rm -f *.o text.exe
+	rm -f $(TARGET) $(OBJS)

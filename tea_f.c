@@ -39,7 +39,7 @@ void teacher_sign_in()
         x=ver_code(x);                                 //验证码
         printf("----------------------------------------");
         struct teacher *s = search_teacher(hand,id);
-        if(s != NULL && (s->id,id) == 0)
+        if(s != NULL && strcmp(s->id,id) == 0)
         {    
             printf("用户已存在\n");
             printf("退出请按0,继续注册请按1\n");
@@ -291,14 +291,14 @@ void free_list(struct teacher*hand)
 void teacher_info()
 {
     int x=1;
-    struct teacher*tea_hand = NULL;
-    struct student*stu_hand = NULL;
+    struct teacher*tea_hand;
+    struct student*stu_hand;
     tea_hand = create_node();
     tea_hand = teacher_read(tea_hand);
     stu_hand = stu_create_node();
     stu_hand = student_read(stu_hand);     //读学生信息
-    struct student*ps = NULL;
-    struct teacher*s = NULL;
+    struct student*ps;
+    struct teacher*s;
     s = create_node();
     while(x)
     {
@@ -357,7 +357,12 @@ void teacher_info()
             //case 4:email();break;
            // case 5:tea_question();break;
             //case 6:sma_umb();break;
-            case 7:flag = delete_tea_data(tea_hand,s);break;
+            case 7:int h = delete_tea_data(tea_hand,s);
+		   if(h==0)
+		   {
+		       return;
+		   }
+		   break;
             case 0:flag = 0; 
             break;
             default:printf("无此功能\n");
@@ -580,24 +585,24 @@ struct teacher* change_password(struct teacher*current)
     size_t len = strlen(password_first);
     if(len > 0 && password_first[len-1]=='\n')
     {
-        password_first[len-1] == '\0';
+        password_first[len-1] = '\0';
     }
     if (strlen(password_first) > 16)
     {
         printf("密码长度过长，请重新输入\n");
-        return;
+        return current;
     }
     printf("再输一次:");
     fgets(password_second,sizeof(password_second),stdin);
     len = strlen(password_second);
     if(len > 0 && password_second[len-1]=='\n')
     {
-        password_second[len-1] == '\0';
+        password_second[len-1] = '\0';
     }
     if (strlen(password_second) > 16)
     {
         printf("密码长度过长，请重新输入\n");
-        return;
+        return current;
     }
     if(strcmp(password_first,password_second)==0)
     {
@@ -608,7 +613,7 @@ struct teacher* change_password(struct teacher*current)
     else
     {
         printf("两次输入不同,修改错误\n");
-        return;
+        return current;
     }
 
 }
@@ -634,7 +639,7 @@ int delete_tea_data(struct teacher*hand,struct teacher*current)
     {
         char id[20];
         sscanf(line,"%*s %*s %s",id);
-        if(strcmp(id,current->id)==0)
+        if(strcmp(id,current->id)!=0)
         {
             fputs(line,temp_fp);
         }
@@ -642,8 +647,8 @@ int delete_tea_data(struct teacher*hand,struct teacher*current)
     fclose(fp);
     fclose(temp_fp);
     remove("./teacher_data.txt");
-    rename("temp_fp.txt","./teacher_data.txt");
-    if(current = hand)
+    rename("temp.txt","./teacher_data.txt");
+    if(current == hand)
     {
         hand->next = current->next;
     }
@@ -665,14 +670,14 @@ void teacher_write(struct teacher*current)
 {
      FILE*fp=fopen("./teacher_data.txt","r+");
      assert(fp!=NULL);
-     char line[100];
+     char line[150];
      char id_found[20];
      int found;
      strcpy(id_found,current->id);
      while(fgets(line,sizeof(line),fp)!=NULL)
      {
-	     struct teacher*temp;
-	     sscanf(line,"%s %s %s %d",temp->name,temp->password,temp->id,temp->age);
+	     struct teacher*temp = create_node();
+	     sscanf(line,"%s %s %s %d",temp->name,temp->password,temp->id,&temp->age);
 	     if(strcmp(temp->id,id_found)==0)
 	     {
 		     found = 1;
@@ -700,8 +705,8 @@ void stu_write(struct student*current)
      strcpy(id_found,current->id);
      while(fgets(line,sizeof(line),fp)!=NULL)
      {
-	     struct student*temp;
-	     sscanf(line,"%s %s %s %d %s",temp->name,temp->password,temp->id,temp->age,temp->class);
+	     struct student*temp = stu_create_node();
+	     sscanf(line,"%s %s %s %d %s",temp->name,temp->password,temp->id,&temp->age,temp->class);
 	     if(strcmp(temp->id,id_found)==0)
 	     {
 		     found = 1;
